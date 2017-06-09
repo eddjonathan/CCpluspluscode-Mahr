@@ -1,0 +1,6 @@
+source ~/.profile
+make clean 
+make all
+
+
+make VirtualLeaf

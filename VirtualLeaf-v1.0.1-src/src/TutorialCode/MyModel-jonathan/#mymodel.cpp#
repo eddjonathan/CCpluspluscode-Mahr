@@ -1,0 +1,245 @@
+/*
+ *
+ *  This file is part of the Virtual Leaf.
+ *
+ *  The Virtual Leaf is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The Virtual Leaf is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with the Virtual Leaf.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright 2010 Roeland Merks.
+ *
+ */
+
+#include <QObject>
+#include <QtGui>
+
+#include "simplugin.h"
+
+#include "parameter.h"
+
+#include "wallbase.h"
+#include "cellbase.h"
+#include "mymodel.h"
+
+
+#include "math.h"
+#include "pi.h"
+#include "random.h"
+
+
+static const std::string _module_id("$Id: mymodel.cpp,v 6bcb69712a0e 2010/11/24 17:02:13 roeland $");
+
+QString mymodel::ModelID(void) {
+  // specify the name of your model here
+  return QString( "jonathan model(does nothing)" );
+}
+
+// return the number of chemicals your model uses
+int mymodel::NChem(void) { return 1; }
+
+// To be executed after cell division
+void mymodel::OnDivide(ParentInfo *parent_info, CellBase *daughter1, CellBase *daughter2) {
+  // rules to be executed after cell division go here
+  // (e.g., cell differentiation rules)
+
+
+/***
+if (daughter1->AtBoundaryP() && daughter2->AtBoundaryP()) {
+		
+			daughter1->SetStiffness(200);
+
+			daughter2->SetStiffness(200);
+		}
+
+
+else {
+			// otherwise choose the one that is still at the perimeter
+			if (daughter1->AtBoundaryP()) {
+				daughter1->SetStiffness(200);
+				daughter2->SetStiffness(100);
+			} else {
+				daughter1->SetStiffness(100);
+				daughter2->SetStiffness(200);
+			}
+		}****/
+
+//else {
+//			// otherwise choose the one that is still at the perimeter
+//			 {
+//				daughter1->SetStiffness(100);
+//				daughter2->SetStiffness(100);
+//			} 
+//}
+
+
+//if (c->AtBoundaryP()){
+////c->Stiffness()=10000;
+//c->SetStiffness(100);
+//c->Stiffness();
+//}
+//else {
+//c->SetStiffness(100);
+//c->Stiffness();
+//}
+
+}
+
+void mymodel::SetCellColor(CellBase *c, QColor *color) { 
+  // add cell coloring rules here
+
+double red=c->Chemical(0)/(1.+c->Chemical(0));
+double green=c->Chemical(1)/(1.+c->Chemical(1));
+double blue=c->Chemical(2)/(1.+c->Chemical(2));
+color->setRgbF(red,green,blue);	
+	
+
+}
+
+void mymodel::CellHouseKeeping(CellBase *c) {
+  // add cell behavioral rules here
+	double orientation = Pi*RANDOM();
+	Vector axis(sin(orientation), cos(orientation),0.);
+
+
+//if (CellBase::NCells()==4)      // I ADDED THIS IN THE LAST MODEIFICATION : CHECK IT !!!!!
+// first cell expands unconditionally
+//par->lambda_length=10000;
+//else
+
+//if (c->CellType()==0) {
+//		par->lambda_length=100;
+//	}
+
+//if (c->CellType()==1) {
+//		par->lambda_length=200;
+//	}
+
+//if (c->AtBoundaryP()) {
+//c->SetCellType(1);		
+////par->lambda_length=200;
+//	}
+
+//else {
+
+//c->SetCellType(0);		}
+
+
+
+
+
+
+par->lambda_length=1000;
+par->rel_perimeter_stiffness=2;
+par->rel_cell_div_threshold=1;
+par->energy_threshold=1000;
+par->morphogen_div_threshold=0;
+par->morphogen_expansion_threshold=0;
+par->collapse_node_threshold=0;
+//par->auxin_dependant_growth=false;
+par->mc_cell_stepsize=0.2;
+par->cell_expansion_rate=10;
+par->cell_div_expansion_rate=10;
+
+
+//par->stiffness=1000;
+	
+//c->SetStiffness(1000); 
+//c->stiff;
+
+	//c->par->lambda_length=1000;
+	//par->rel_perimeter_stiffness=40;
+
+
+
+//c->EnlargeTargetArea(par->cell_expansion_rate);
+
+
+
+/***if (c->AtBoundaryP())
+{
+
+c->EnlargeTargetArea(1*par->cell_expansion_rate);
+	if (c->Area()>2*c->BaseArea()) {
+	c->Divide();                      // divide shortest principle axis after area(t+delta)=2*area(t)
+}
+}****/
+
+//else
+{
+
+//c->EnlargeTargetArea(1*par->cell_expansion_rate);  *** DEFAULT FORM USE IT !!**
+
+c->EnlargeTargetArea(1*par->cell_expansion_rate);
+
+//c->Area()==c->Chemical(0)*c->Area();
+
+
+if(c->Chemical(0)>0.05)
+{
+if (c->Area()>2*c->BaseArea()) {
+//c->DivideOverAxis(Vector(0,0,0));	
+c->Divide();
+//c->DivideOverAxis(axis);                      // divide shortest principle axis after area(t+delta)=2*area(t)
+//c->SetLambdaLength(20);
+//c->SetStiffness(200); 
+}
+	//c->DivideOverAxis(Vector(0,1,0));   // divide along the given axis after area(t+delta)=2*area(t)
+	
+	//c->DivideOverAxis(axis);	     // divide along random axis after area(t+delta)=2*area(t)	
+}
+else
+{
+if (c->Area()>2*c->BaseArea()) {
+	c->Divide(); 
+}	
+}
+
+}
+
+
+}
+
+void mymodel::CelltoCellTransport(Wall *w, double *dchem_c1, double *dchem_c2) {
+  // add biochemical transport rules here
+
+{
+//if (w->C2()->BoundaryPolP())
+//if (w->C1()->BoundaryPolP()||w->C2()->BoundaryPolP())
+//return;
+
+else{
+for (int c=0;c<NChem();c++){
+double phi = w->Length() * par->D[0] * ( w->C2()->Chemical(0) - w->C1()->Chemical(0) );
+	dchem_c1[0]+=phi;
+	dchem_c2[0]-=phi;
+}
+//w->Length()*
+}
+}
+	
+}
+
+
+void mymodel::WallDynamics(Wall *w, double *dw1, double *dw2) {
+  // add biochemical networks for reactions occuring at walls here
+}
+
+
+void mymodel::CellDynamics(CellBase *c, double *dchem) { 
+  // add biochemical networks for intracellular reactions here
+
+double A=c->Chemical(0);
+dchem[0]=(par->d*A-par->mu*A);	
+}
+
+
+Q_EXPORT_PLUGIN2(mymodel, mymodel)
